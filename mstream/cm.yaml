@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mstream-config
+  namespace: final
+data:
+  PUID: "1000"
+  PGID: "1000"
+  TZ: "Etc/AR"
+

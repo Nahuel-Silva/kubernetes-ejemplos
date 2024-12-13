@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: openwebui
+  namespace: final
+spec:
+  serviceName: "openwebui"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openwebui
+  template:
+    metadata:
+      labels:
+        app: openwebui
+    spec:
+      containers:
+      - name: open-webui
+        image: ghcr.io/open-webui/open-webui:main
+        ports:
+        - containerPort: 8080
+        env:
+          - name: OLLAMA_BASE_URL #Es el nombre que va a tener la variable dentro del pod (hay que ver como te la pide el contendor)
+            valueFrom: 
+              configMapKeyRef:
+                name: openwebui-config #(nombre del ConfigMap)
+                key: URL #Hace referencia a la key del ConfigMap
+        volumeMounts:
+        - name: openwebui-data
+          mountPath: /app/backend/data
+
+  volumeClaimTemplates:
+  - metadata:
+      name: openwebui-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi

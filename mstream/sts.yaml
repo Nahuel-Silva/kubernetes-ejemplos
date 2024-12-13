@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mstream
+  namespace: final
+spec:
+  serviceName: "mstream"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mstream
+  template:
+    metadata:
+      labels:
+        app: mstream
+    spec:
+      containers:
+      - name: mstream
+        image: lscr.io/linuxserver/mstream:latest
+        ports:
+        - containerPort: 3000
+
+        env:
+          - name: PUID
+            valueFrom:
+              configMapKeyRef:
+                name: mstream-config
+                key: PUID
+          - name: PGID
+            valueFrom:
+              configMapKeyRef:
+                name: mstream-config
+                key: PGID
+
+          - name: TZ
+            valueFrom:
+              configMapKeyRef:
+                name: mstream-config
+                key: TZ
+
+        volumeMounts:
+        - name: mstream-music
+          mountPath: /music
+
+        - name: mstream-config
+          mountPath: /config
+
+  volumeClaimTemplates:
+  - metadata:
+      name: mstream-music
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+
+  - metadata:
+      name: mstream-config
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+
+
